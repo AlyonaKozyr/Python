@@ -1,3 +1,4 @@
+cd C:\Users\¿À≈Õ¿\Desktop\GitHubFiles\PythonWoks
 1) git status
 2) git add <»Ïˇ Ù‡ÈÎ‡>
 3) git commit -m "comment"
