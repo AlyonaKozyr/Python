@@ -15,6 +15,7 @@ def is_prime(n):
     else:
         return True
 
+
 def gcd(a, b):
     """
     >>> gcd(12, 15)
