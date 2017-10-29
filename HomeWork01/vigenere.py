@@ -62,12 +62,3 @@ def decrypt_vigenere(ciphertext, keyword):
             else:
                 plaintext += chr(ord(text[i]) - ord(key[i]) + 97)
     return plaintext
-
-
-print(encrypt_vigenere("PYTHON", "A"))
-print(encrypt_vigenere("python", "a"))
-print(encrypt_vigenere("ATTACKATDAWN", "LEMON"))
-
-print(decrypt_vigenere("PYTHON", "A"))
-print(decrypt_vigenere("python", "a"))
-print(decrypt_vigenere("LXFOPVEFRNHR", "LEMON"))
