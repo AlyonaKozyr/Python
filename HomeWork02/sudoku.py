@@ -102,21 +102,11 @@ def find_possible_values(grid, pos):
     >>> set(values) == {'2', '5', '9'}
     True
     """
-    numb = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    row = get_row(grid, pos)
-    col = get_col(grid, pos)
-    block = get_block(grid, pos)
-    for i in range(1,10):
-        if str(i) in row:
-            numb.remove(i)
-            continue
-        if str(i) in col:
-            numb.remove(i)
-            continue
-        for k in range(3):
-            if str(i) in block[k]:
-                numb.remove(i)
-    return numb
+    var = set('123456789')
+    row = set(get_row(grid, pos))
+    col = set(get_col(grid, pos))
+    values_in_block = set(get_block(grid, pos))
+    return var - set.union(values_in_block, set.union(row, col))
 
 
 def solve(grid):
