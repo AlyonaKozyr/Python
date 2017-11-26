@@ -137,61 +137,61 @@ def solve(grid):
                 return grid
     grid[b[0]][b[1]] = "."
 
-    def check_solution(solution):
-        """ Если решение solution верно, то вернуть True, в противном случае False """
-        for i in range(9):
-            v1 = set('123456789')
-            v2 = set('123456789')
-            v3 = set('123456789')
-            row = set(get_row(solution, (i, 0)))
-            col = set(get_col(solution, (0, i)))
-            v1 -= row
-            v2 -= col
-            if v1 and v2 != set():
+def check_solution(solution):
+    """ Если решение solution верно, то вернуть True, в противном случае False """
+    for i in range(9):
+        v1 = set('123456789')
+        v2 = set('123456789')
+        v3 = set('123456789')
+        row = set(get_row(solution, (i, 0)))
+        col = set(get_col(solution, (0, i)))
+        v1 -= row
+        v2 -= col
+        if v1 and v2 != set():
+            return False
+    for i in range(3):
+        for j in range(3):
+            block = set(get_block(solution, (i, j)))
+            v3 -= block
+            if v3 != set():
                 return False
-        for i in range(3):
-            for j in range(3):
-                block = set(get_block(solution, (i, j)))
-                v3 -= block
-                if v3 != set():
-                    return False
-        return True
+    return True
 
-    def generate_sudoku(N):
-        """ Генерация судоку, заполненного на N элементов
+def generate_sudoku(N):
+    """ Генерация судоку, заполненного на N элементов
 
-        >>> grid = generate_sudoku(40)
-        >>> sum(1 for row in grid for e in row if e == '.')
-        41
-        >>> solution = solve(grid)
-        >>> check_solution(solution)
-        True
-        >>> grid = generate_sudoku(1000)
-        >>> sum(1 for row in grid for e in row if e == '.')
-        0
-        >>> solution = solve(grid)
-        >>> check_solution(solution)
-        True
-        >>> grid = generate_sudoku(0)
-        >>> sum(1 for row in grid for e in row if e == '.')
-        81
-        >>> solution = solve(grid)
-        >>> check_solution(solution)
-        True
-        """
-        N = 81 - N
-        grid = [['.' for i in range(9)] for j in range(9)]
-        grid = solve(grid)
-        for elem in range(N):
+    >>> grid = generate_sudoku(40)
+    >>> sum(1 for row in grid for e in row if e == '.')
+    41
+    >>> solution = solve(grid)
+    >>> check_solution(solution)
+    True
+    >>> grid = generate_sudoku(1000)
+    >>> sum(1 for row in grid for e in row if e == '.')
+    0
+    >>> solution = solve(grid)
+    >>> check_solution(solution)
+    True
+    >>> grid = generate_sudoku(0)
+    >>> sum(1 for row in grid for e in row if e == '.')
+    81
+    >>> solution = solve(grid)
+    >>> check_solution(solution)
+    True
+    """
+    N = 81 - N
+    grid = [['.' for i in range(9)] for j in range(9)]
+    grid = solve(grid)
+    for elem in range(N):
+        row = random.randrange(0, 9)
+        col = random.randrange(0, 9)
+        while grid[row][col] == '.':
             row = random.randrange(0, 9)
             col = random.randrange(0, 9)
-            while grid[row][col] == '.':
-                row = random.randrange(0, 9)
-                col = random.randrange(0, 9)
-            grid[row][col] = '.'
-        return grid
+        grid[row][col] = '.'
+    return grid
 
-    if __name__ == '__main__':
-        for fname in ('puzzle1.txt', 'puzzle2.txt', 'puzzle3.txt'):
-            grid = read_sudoku(fname)
-            solve(grid)
+if __name__ == '__main__':
+    for fname in ('puzzle1.txt', 'puzzle2.txt', 'puzzle3.txt'):
+        grid = read_sudoku(fname)
+        solve(grid)
