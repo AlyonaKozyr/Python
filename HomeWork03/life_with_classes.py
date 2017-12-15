@@ -32,27 +32,24 @@ class GameOfLife:
             pygame.draw.line(self.screen, pygame.Color('black'),
                     (0, y), (self.width, y))
 
-    def draw_grid(self):
-        """ Отрисовать сетку """
-        for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (x, 0), (x, self.height))
-        for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (0, y), (self.width, y))
-
     def draw_cell_list(self, clist):
         """ Отображение списка клеток
         :param rects: Список клеток для отрисовки, представленный в виде матрицы
         """
-        for r in range(self.cell_height):
-            for c in range(self.cell_width):
-                if clist[r][c].state:
+        for row in range(self.cell_height):
+            for col in range(self.cell_width):
+                if clist[row][col].state:
                     pygame.draw.rect(self.screen, pygame.Color('green'),
-                                     (c * self.cell_size, r * self.cell_size, self.cell_size, self.cell_size))
+                                     (col * self.cell_size,
+                                      row * self.cell_size,
+                                      self.cell_size,
+                                      self.cell_size))
                 else:
                     pygame.draw.rect(self.screen, pygame.Color('white'),
-                                     (c * self.cell_size, r * self.cell_size, self.cell_size, self.cell_size))
+                                     (col * self.cell_size,
+                                      row * self.cell_size,
+                                      self.cell_size,
+                                      self.cell_size))
 
     def run(self):
         """ Запустить игру """
@@ -79,7 +76,7 @@ class GameOfLife:
 
 class Cell:
 
-    def __init__(self, row, col, state=False):
+    def __init__(self, row, col, state=0):
         self.row = row
         self.col = col
         self.state = state
@@ -95,18 +92,23 @@ class CellList:
         self.ncols = ncols
         self.randomize = randomize
         if randomize:
-            self.clist = [[Cell(r,c,random.randint(0,1)) for c in range(ncols)] for r in range(nrows)]
+            self.clist = [[Cell(row, col, random.randint(0, 1))
+                           for col in range(ncols)]
+                          for row in range(nrows)]
         else:
-            self.clist = [[Cell(r, c) for c in range(ncols)] for r in range(nrows)]
+            self.clist = [[Cell(row, col) for col in range(ncols)]
+                          for row in range(nrows)]
 
     def get_neighbours(self, cell):
         neighbours = []
         row, col = cell.row, cell.col
-        positions = [[-1, 1], [-1, 0], [-1, -1], [0, 1], [1, -1], [1, 0], [1, 1], [0, -1]]
-        for i in positions:
-            if 0 <= row + i[0] < self.nrows \
-             and 0 <= col + i[1] < self.ncols:
-                neighbours.append(self.clist[row + i[0]][col + i[1]])
+        positions = [[-1, -1], [-1, 0], [-1, 1], [0, -1],
+                     [0, 1], [1, -1], [1, 0], [1, 1]]
+        for neighbour in positions:
+            if (0 <= neighbour[0] + row < self.nrows) and\
+               (0 <= neighbour[1] + col < self.ncols):
+                    neighbours.append(self.clist[neighbour[0] + row]
+                                                [neighbour[1] + col])
         return neighbours
 
     def update(self):
@@ -115,14 +117,14 @@ class CellList:
             for col in range(self.ncols):
                 cell = self.clist[row][col]
                 neighbours = self.get_neighbours(cell)
-                amt = sum(i.is_alive() for i in neighbours)
+                amount = sum(neighbour.is_alive() for neighbour in neighbours)
                 if cell.is_alive():
-                    if 1 < amt < 4:
+                    if 1 < amount < 4:
                         new_clist[cell.row][cell.col].state = 1
                     else:
                         new_clist[cell.row][cell.col].state = 0
                 else:
-                    if amt == 3:
+                    if amount == 3:
                         new_clist[cell.row][cell.col].state = 1
         self.clist = new_clist
         return self
@@ -133,11 +135,13 @@ class CellList:
         return self
 
     def __next__(self):
-        self.n = self.start
-        if self.n <= self.end:
+        self.numcol += 1
+        if self.numcol == self.ncols:
+            self.numcol = 0
+            self.numrow += 1
+        if self.numrow == self.nrows:
             raise StopIteration
-        self.n -= self.step
-        return self.n
+        return self.clist[self.numrow][self.numcol]
 
     def __str__(self):
         string = '['
@@ -158,17 +162,16 @@ class CellList:
         return string
 
     @classmethod
-    def from_file(cls, fname):
+    def from_file(cls, filename):
         grid = []
-        with open(fname) as f:
-            for nrow, line in enumerate(f):
-                row = []
-                for ncol, state in enumerate(line):
-                    if state in "01":
-                        row.append(Cell(nrow, ncol, int(state)))
-                grid.append(row)
-            return grid
-
+        with open(filename) as f:
+            for row, line in enumerate(f):
+                grid.append([Cell(row, col, int(state))
+                             for col, state in enumerate(line)
+                             if state in '01'])
+        clist = cls(len(grid), len(grid[0]))
+        clist.clist = grid
+        return clist
 
 if __name__ == '__main__':
     game = GameOfLife(320, 240, 10)
